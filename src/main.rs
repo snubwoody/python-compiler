@@ -22,10 +22,10 @@ fn main() {
 	let mut rg3 = Register::new();
 	let mut rg4 = Register::new();
 
-	let mut stack:DataStack<'_> = DataStack::new();
+	let mut stack:DataStack = DataStack::new();
 	
-	stack._push(&INT(1));
-	stack.get(0);
+	stack._push(INT(1));
+	stack.get(0).unwrap();
 
     match file_to_string("src/main.py") {
 
@@ -44,6 +44,9 @@ fn main() {
 					rg2.mov(INT(expression.left_expr.parse::<i32>().unwrap()));
 					rg2.add(expression.right_expr.parse::<i32>().unwrap());
 				},
+				&EQUALS => {
+					println!("{:?}",expression)
+				}
 				_ => {
 				}
 		}

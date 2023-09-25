@@ -49,6 +49,7 @@ pub enum DataType {
 	BOOL(bool)
 }
 
+#[derive(Debug)]
 pub enum StackError {
 	AddressEmpty
 }
@@ -101,24 +102,24 @@ impl Register {
 }
 
 #[derive(PartialEq,Debug)]
-pub struct DataStack<'a> {
-	pub data:Vec<&'a DataType>
+pub struct DataStack {
+	pub data:Vec<DataType>
 }
 
-impl<'a> DataStack<'a>  {
+impl DataStack {
 	pub fn new() -> Self {
 		DataStack { data:Vec::new() }
 	}
 
-	pub fn _push(&'a mut self,value:&'a DataType) {
+	pub fn _push(&mut self,value:DataType) {
 		self.data.push(value);
 		
 	}
 	
-	pub fn get(&self,address:usize) -> Result<&DataType,StackError> {
+	pub fn get(&self,address:usize) -> Result<DataType,StackError> {
 		let stack = &self.data;
 		if address < stack.len(){
-			Ok(stack[address])
+			Ok(stack[address].clone())
 		}
 		else {
 			println!("Error: Stack address is empty");
