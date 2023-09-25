@@ -2,8 +2,7 @@ var = 9
 test = "hello world"
 5 + 2
 
-def printf():
-	print("hello world")
+print("hello world")
 
 def p():
 	None
@@ -17,4 +16,4 @@ class TokenType:
 		pass
 
 name = "Waku"
-printf()
+9/2

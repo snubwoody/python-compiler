@@ -18,10 +18,11 @@ pub fn tokenize(input_str:&str) -> Vec<Token>{
 		TokenRegex{_type:&NUMBER,regex_pattern:Regex::new(r"\d").unwrap()},
 		TokenRegex{_type:&WORD,regex_pattern:Regex::new(r"\w+[^(\n\s)]+\w").unwrap()},
 		TokenRegex{_type:&QUOTATION,regex_pattern:Regex::new(r#"""#).unwrap()},
-		TokenRegex{_type:&DIVIDE,regex_pattern:Regex::new(r#"(\\\\)"#).unwrap()},
+		TokenRegex{_type:&DIVIDE,regex_pattern:Regex::new(r#"(\/)"#).unwrap()},
 		TokenRegex{_type:&MULTIPY,regex_pattern:Regex::new(r#"(\*)"#).unwrap()},
 		TokenRegex{_type:&ADD,regex_pattern:Regex::new(r#"(\+)"#).unwrap()},
-		TokenRegex{_type:&SUBTRACT,regex_pattern:Regex::new(r#"(\-)"#).unwrap()}
+		TokenRegex{_type:&SUBTRACT,regex_pattern:Regex::new(r#"(\-)"#).unwrap()},
+		TokenRegex{_type:&GREATERTHAN,regex_pattern:Regex::new(r#"(\-)"#).unwrap()}
 	];
 	
 	for i in regex_patterns {
@@ -44,7 +45,7 @@ pub fn tokenize(input_str:&str) -> Vec<Token>{
 			if quotation_found{
 				let start_position:&Vec<usize> = string_vec.first().unwrap();
 				let end_postion = string_vec.last().unwrap();
-				tokens_temp.push(Token { _type:&STRING, position:vec![start_position[0],end_postion[1]] });
+				tokens_temp.push(Token { _type:&TSTRING, position:vec![start_position[0],end_postion[1]] });
 				string_vec.clear();
 			}
 			quotation_found = !quotation_found;
@@ -67,7 +68,7 @@ pub fn tokenize(input_str:&str) -> Vec<Token>{
 	let mut to_be_removed = vec![];
 
 	tokens.iter().for_each(|token|{
-		if token._type == &STRING{
+		if token._type == &TSTRING{
 			let range = &token.position;
 			tokens.iter().for_each(|item| {
 				if (range.contains(&item.position[0]) || range.contains(&item.position[1])) && item != token{

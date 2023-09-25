@@ -3,7 +3,7 @@ use std::io::{Read,self};
 use std::fs::File;
 use std::env;
 use std::path;
-use RegisterValue::*;
+use DataType::*;
 use std::ops::Range;
 
 
@@ -24,9 +24,10 @@ pub enum TokenType {
 
 	NUMBER,
 	WORD,
-	STRING,
+	TSTRING,
 
-	QUOTATION
+	QUOTATION,
+	GREATERTHAN
 }
 
 pub struct TokenRegex <'a> {
@@ -41,6 +42,16 @@ pub struct Token<'a> {
 	pub position:Vec<usize>
 }
 
+#[derive(PartialEq, Eq,Debug,Clone)]
+pub enum DataType {
+	INT(i32),
+	STRING(String),
+	BOOL(bool)
+}
+
+pub enum StackError {
+	AddressEmpty
+}
 #[derive(Debug)]
 pub struct BinaryExpr<'a> {
 	pub left_expr:String,
@@ -54,14 +65,9 @@ pub enum LiteralType<'a> {
 	NUMBERLTR(i32)
 }
 
-#[derive(PartialEq, Eq,Debug)]
-pub enum RegisterValue{
-	RINT(i32),
-	RSTRING(String)
-}
 #[derive(PartialEq, Eq)]
 pub struct Register{
-	pub value:Option<RegisterValue>
+	pub value:Option<DataType>
 }
 
 //TODO theres A LOT of potential undefined behaviour here FIX IT
@@ -72,40 +78,52 @@ impl Register {
 
 	pub fn get_int(&self) -> Option<&i32> {
 		match &self.value {
-			Some(RINT(int)) => {
+			Some(INT(int)) => {
 				Some(int)
 			},
-			Some(RSTRING(_)) => {
-				None
-			},
 			None => {
 				println!("reg is empty");
+				None
+			},
+			_ => {
 				None
 			}
 		}
 	}
 
-	pub fn get_string(&self) -> Option<&String> {
-		match &self.value {
-			Some(RINT(_)) => {
-				None
-			},
-			Some(RSTRING(string)) => {
-				Some(string)
-			},
-			None => {
-				println!("reg is empty");
-				None
-			}
-		}
-	}
-
-	pub fn mov(&mut self,value:RegisterValue) {
+	pub fn mov(&mut self,value:DataType) {
 		self.value = Option::Some(value);
 	}
 
 	pub fn add(&mut self,value:i32) {
-		self.value = Option::Some(RINT(self.get_int().unwrap()+value));
+		self.value = Option::Some(INT(self.get_int().unwrap()+value));
+	}
+}
+
+#[derive(PartialEq,Debug)]
+pub struct DataStack<'a> {
+	pub data:Vec<&'a DataType>
+}
+
+impl<'a> DataStack<'a>  {
+	pub fn new() -> Self {
+		DataStack { data:Vec::new() }
+	}
+
+	pub fn _push(&'a mut self,value:&'a DataType) {
+		self.data.push(value);
+		
+	}
+	
+	pub fn get(&self,address:usize) -> Result<&DataType,StackError> {
+		let stack = &self.data;
+		if address < stack.len(){
+			Ok(stack[address])
+		}
+		else {
+			println!("Error: Stack address is empty");
+			Err(StackError::AddressEmpty)
+		}
 	}
 }
 
