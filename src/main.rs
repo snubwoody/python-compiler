@@ -5,7 +5,6 @@ use python_compiler::{
 	DataType::*,
 	Register,
 	Token,
-	TokenType::*,
 	DataStack,
 	BinaryExpr
 };
@@ -26,40 +25,19 @@ fn main() {
 
 	let mut stack:DataStack = DataStack::new();
 	
-	stack._push(INT(1));
-	stack.get(0).unwrap();
-
-	rg1.mov(INT(1));
-	//rg1.out();
-
     match file_to_string("src/main.py") {
 
 		Ok(file_contents) => {
 			file_tokens = tokenize(&file_contents);
 			expressions = parse_expressions(&file_tokens, &file_contents);
+
+			file_tokens.iter().for_each(|token| println!("{:?}",token))
 		}
 		Err(error) => {
 			println!("{}",error);
 		}
 	}
 
-	expressions.iter().for_each(|expression|
-		match expression.operator {
-				&ADD => {
-					rg2.mov(INT(expression.left_expr.parse::<i32>().unwrap()));
-					rg2.add(expression.right_expr.parse::<i32>().unwrap());
-				},
-				&EQUALS => {
-					//println!("{:?}",expression)
-				}
-				_ => {
-				}
-		}
-			
-	);
-
-	assert_eq!(rg2.get_int().unwrap(),&7);
-	
 	
 }
 

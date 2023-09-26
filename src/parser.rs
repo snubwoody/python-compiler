@@ -10,10 +10,7 @@ use python_compiler::{
 pub fn parse_expressions(tokens:&Vec<Token<'_>>,file:&String) -> Vec<BinaryExpr<'static>>{
 	let mut expressions:Vec<BinaryExpr<'_>> = vec![];
 	for (index,token) in tokens.iter().enumerate() {
-		//println!("{:?}",size);
-		if token._type == &EQUALS{
-			
-		}
+		
 		//TODO change the impl for this because there are a lot of operators
 		match token._type {
 			&EQUALS => {
@@ -74,9 +71,7 @@ pub fn parse_expressions(tokens:&Vec<Token<'_>>,file:&String) -> Vec<BinaryExpr<
 					expressions.push(BinaryExpr{left_expr:identifier,operator:&SUBTRACT,right_expr:value})
 				}
 			},
-			_ => {
-
-			}
+			_ => {}
 		}
 		
 	}

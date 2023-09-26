@@ -22,7 +22,9 @@ pub enum TokenType {
 	TSTRING,
 
 	QUOTATION,
-	GREATERTHAN
+	GREATERTHAN,
+	OPENPARENTHESIS,
+	CLOSEPARENTHESIS
 }
 
 pub struct TokenRegex <'a> {
@@ -43,6 +45,29 @@ pub enum DataType {
 	BOOL(bool)
 }
 
+impl DataType {
+    pub fn get_int(&self) -> Option<i32> {
+        match self {
+            INT(value) => Some(*value),
+            _ => None,
+        }
+    }
+
+    pub fn get_string(&self) -> Option<String> {
+        match self {
+            STRING(value) => Some(value.clone()),
+            _ => None,
+        }
+    }
+
+    pub fn get_bool(&self) -> Option<bool> {
+        match self {
+            BOOL(value) => Some(*value),
+            _ => None,
+        }
+    }
+}
+
 #[derive(Debug)]
 pub enum StackError {
 	AddressEmpty
@@ -54,7 +79,7 @@ pub struct BinaryExpr<'a> {
 	pub right_expr:String
 }
 
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq,Clone)]
 pub struct Register{
 	pub value:Option<DataType>
 }
@@ -65,36 +90,34 @@ impl Register {
 		Register { value:None }
 	}
 
-	pub fn get_int(&self) -> Option<&i32> {
-		match &self.value {
-			Some(INT(int)) => {
-				Some(int)
-			},
-			None => {
-				println!("reg is empty");
-				None
-			},
-			_ => {
-				None
-			}
-		}
-	}
-
 	pub fn mov(&mut self,value:DataType) {
 		self.value = Option::Some(value);
 	}
 
 	pub fn add(&mut self,value:i32) {
-		self.value = Option::Some(INT(self.get_int().unwrap()+value));
+		let register = self.clone();
+		self.value = Option::Some(INT(register.value.unwrap().get_int().unwrap() + value))
 	}
 
-	/*
-		pub fn out(&self){
-		match self.value {
-			Some()
+	pub fn out(&self){
+		let data = self.value.clone();
+		
+		match data {
+			Some(INT(val)) => {
+				println!("{:?}",val)
+			},
+			Some(STRING(val)) => {
+				println!("{:?}",val)
+			},
+			Some(BOOL(val)) => {
+				println!("{:?}",val)
+			},
+			_ => {
+				println!("the register is empty")
+			}
 		}
 	} 
-	*/
+	
 }
 
 #[derive(PartialEq,Debug)]
@@ -124,3 +147,4 @@ impl DataStack {
 	}
 
 }
+

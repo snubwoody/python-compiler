@@ -22,7 +22,9 @@ pub fn tokenize(input_str:&str) -> Vec<Token>{
 		TokenRegex{_type:&MULTIPY,regex_pattern:Regex::new(r#"(\*)"#).unwrap()},
 		TokenRegex{_type:&ADD,regex_pattern:Regex::new(r#"(\+)"#).unwrap()},
 		TokenRegex{_type:&SUBTRACT,regex_pattern:Regex::new(r#"(\-)"#).unwrap()},
-		TokenRegex{_type:&GREATERTHAN,regex_pattern:Regex::new(r#"(\-)"#).unwrap()}
+		TokenRegex{_type:&GREATERTHAN,regex_pattern:Regex::new(r#"(\-)"#).unwrap()},
+		TokenRegex{_type:&OPENPARENTHESIS,regex_pattern:Regex::new(r#"\("#).unwrap()},
+		TokenRegex{_type:&CLOSEPARENTHESIS,regex_pattern:Regex::new(r#"\)"#).unwrap()}
 	];
 	
 	for i in regex_patterns {

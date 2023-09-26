@@ -18,8 +18,7 @@ pub fn get_string(string:&String,range:Range<usize>) -> String{
 	let mut word = String::new();
 	let range = range;
 		
-	for i in range.into_iter(){
-		word.push(string.chars().nth(i).unwrap())
-	}
+	for i in range.into_iter(){word.push(string.chars().nth(i).unwrap())}
+	
 	return word;
 }
