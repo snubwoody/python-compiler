@@ -1,13 +1,15 @@
 mod lexer;
 mod parser;
-use python_compiler::{file_to_string, BinaryExpr};
+mod utils;
 use python_compiler::{
 	DataType::*,
 	Register,
 	Token,
 	TokenType::*,
 	DataStack,
+	BinaryExpr
 };
+use utils::file_to_string;
 use parser::parse_expressions;
 use lexer::tokenize;
 
@@ -27,6 +29,9 @@ fn main() {
 	stack._push(INT(1));
 	stack.get(0).unwrap();
 
+	rg1.mov(INT(1));
+	//rg1.out();
+
     match file_to_string("src/main.py") {
 
 		Ok(file_contents) => {
@@ -45,7 +50,7 @@ fn main() {
 					rg2.add(expression.right_expr.parse::<i32>().unwrap());
 				},
 				&EQUALS => {
-					println!("{:?}",expression)
+					//println!("{:?}",expression)
 				}
 				_ => {
 				}
