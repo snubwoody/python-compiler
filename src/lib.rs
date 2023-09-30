@@ -2,6 +2,7 @@ use regex::Regex;
 use DataType::*;
 
 
+//TODO refactor this to only be an enum not a whole struct
 #[derive(Clone,Debug,PartialEq)]
 pub enum TokenType {
 	NEWLINE,
@@ -20,6 +21,7 @@ pub enum TokenType {
 	NUMBER,
 	WORD,
 	TSTRING,
+	TIDENTIFIER,
 
 	QUOTATION,
 	GREATERTHAN,
@@ -42,7 +44,9 @@ pub struct Token<'a> {
 pub enum DataType {
 	INT(i32),
 	STRING(String),
-	BOOL(bool)
+	BOOL(bool),
+	IDENTIFIER(String),
+	NONE
 }
 
 impl DataType {
@@ -72,11 +76,33 @@ impl DataType {
 pub enum StackError {
 	AddressEmpty
 }
+
+#[derive(Debug)]
+pub enum ExpressionType<'a> {
+	BinaryExpression(BinaryExpr<'a>),
+	LiteralExpression(DataType),
+	GroupingExpression(GroupingExpr)
+}
+
+pub struct Expression<'a> {
+	pub expr:ExpressionType<'a>,
+	pub position:Vec<usize>
+}
+
+impl<'a> Expression<'a> {
+	pub fn new(expr:ExpressionType<'a>,position:Vec<usize>) -> Self{
+		Expression { expr , position }
+	}
+}
 #[derive(Debug)]
 pub struct BinaryExpr<'a> {
 	pub left_expr:String,
 	pub operator:&'a TokenType,
 	pub right_expr:String
+}
+
+#[derive(Debug)]
+pub struct GroupingExpr {
 }
 
 #[derive(PartialEq, Eq,Clone)]

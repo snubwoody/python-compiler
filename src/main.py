@@ -2,6 +2,7 @@ var = 9
 test = "hello world"
 5 + 2
 
+
 print("hello world")
 
 def p():
@@ -16,4 +17,3 @@ class TokenType:
 		pass
 
 name = "Waku"
-9/2

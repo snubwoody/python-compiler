@@ -1,6 +1,6 @@
 mod lexer;
 mod parser;
-mod utils;
+pub mod utils;
 use python_compiler::{
 	DataType::*,
 	Register,
@@ -17,7 +17,7 @@ use lexer::tokenize;
 #[allow(unused_variables,unused_mut)]
 fn main() {
 	let file_tokens: Vec<Token<'_>>;
-	let mut expressions:Vec<BinaryExpr<'_>> = Vec::new();
+	let mut expressions = Vec::new();
 	let mut rg1 = Register::new();
 	let mut rg2 = Register::new();
 	let mut rg3 = Register::new();
@@ -31,7 +31,7 @@ fn main() {
 			file_tokens = tokenize(&file_contents);
 			expressions = parse_expressions(&file_tokens, &file_contents);
 
-			file_tokens.iter().for_each(|token| println!("{:?}",token))
+			//expressions.iter().for_each(|token| println!("{:?}",token))
 		}
 		Err(error) => {
 			println!("{}",error);

@@ -1,14 +1,14 @@
 use python_compiler::{
 	Token,
 	TokenRegex,
-	TokenType::*
+	TokenType::*,
 };
 use regex::Regex;
 
 pub fn tokenize(input_str:&str) -> Vec<Token>{
 	
 	let mut tokens: Vec<Token<'_>> = vec![];
-	//&CLASS,Regex::new(r"(class)").unwrap()
+
 	let regex_patterns: Vec<TokenRegex> = vec![
 		TokenRegex{_type:&CLASS,regex_pattern:Regex::new(r"(class)").unwrap()},
 		TokenRegex{_type:&WHITESPACE,regex_pattern:Regex::new(r"\s").unwrap()},
@@ -62,25 +62,47 @@ pub fn tokenize(input_str:&str) -> Vec<Token>{
 	for (_size,i) in tokens_temp.into_iter().enumerate(){
 		tokens.push(i)
 	}
+	
 	//Removing the whitespace but remember to check for errors before it is removed
 	tokens.sort_by(|a,b| a.position.cmp(&b.position));
 	
 	tokens.retain(|token| token._type != &QUOTATION && token._type != &WHITESPACE);
 
 	let mut to_be_removed = vec![];
+	let mut to_be_added = vec![];
 
 	tokens.iter().for_each(|token|{
-		if token._type == &TSTRING{
-			let range = &token.position;
-			tokens.iter().for_each(|item| {
-				if (range.contains(&item.position[0]) || range.contains(&item.position[1])) && item != token{
-					to_be_removed.push(item.clone());
-				} 
-			})
+		match token._type {  
+			&TSTRING => {
+				let range = &token.position;
+				tokens.iter().for_each(|item| {
+					if (range.contains(&item.position[0]) || range.contains(&item.position[1])) && item != token{
+						to_be_removed.push(item.clone());
+					} 
+				})
+			}
+			_ => {}
 		}
 	});
 
+	
+
 	tokens.retain(|token| !to_be_removed.contains(token));
+
+	tokens.iter().for_each(|token|{
+		match token._type {  
+			&WORD => {
+				to_be_removed.push(token.clone());
+				to_be_added.push(Token { _type: &TIDENTIFIER, position: vec![token.position[0],token.position[1]] })
+			},
+			_ => {}
+		}
+	});
+
+	to_be_added.into_iter().for_each(|token| tokens.push(token));
+	tokens.retain(|token| !to_be_removed.contains(token));
+
+	tokens.sort_by(|a,b| a.position.cmp(&b.position));
 
 	return tokens;
 }
