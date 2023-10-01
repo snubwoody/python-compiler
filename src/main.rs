@@ -2,11 +2,9 @@ mod lexer;
 mod parser;
 pub mod utils;
 use python_compiler::{
-	DataType::*,
 	Register,
 	Token,
-	DataStack,
-	BinaryExpr
+	DataStack
 };
 use utils::file_to_string;
 use parser::parse_expressions;
@@ -30,13 +28,15 @@ fn main() {
 		Ok(file_contents) => {
 			file_tokens = tokenize(&file_contents);
 			expressions = parse_expressions(&file_tokens, &file_contents);
-
-			//expressions.iter().for_each(|token| println!("{:?}",token))
+			//println!("the length of the expr is {:?}",expressions[1]);
+			expressions.iter().for_each(|token| println!("{:?}",token))
 		}
 		Err(error) => {
 			println!("{}",error);
 		}
 	}
+
+	
 
 	
 }

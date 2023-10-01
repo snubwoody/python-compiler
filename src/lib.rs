@@ -46,7 +46,8 @@ pub enum DataType {
 	STRING(String),
 	BOOL(bool),
 	IDENTIFIER(String),
-	NONE
+	NONE,
+	DANGLINGEXPR
 }
 
 impl DataType {
@@ -77,33 +78,19 @@ pub enum StackError {
 	AddressEmpty
 }
 
-#[derive(Debug)]
-pub enum ExpressionType<'a> {
-	BinaryExpression(BinaryExpr<'a>),
-	LiteralExpression(DataType),
-	GroupingExpression(GroupingExpr)
+#[derive(Debug,Clone,PartialEq)]
+pub enum Expression{
+	BinaryExpression(BinaryExpr),
+	LiteralExpression(DataType)
 }
 
-pub struct Expression<'a> {
-	pub expr:ExpressionType<'a>,
-	pub position:Vec<usize>
+#[derive(Debug,Clone,PartialEq)]
+pub struct BinaryExpr{
+	pub left_expr:Box<Expression>,
+	pub operator:TokenType,
+	pub right_expr:Box<Expression>
 }
 
-impl<'a> Expression<'a> {
-	pub fn new(expr:ExpressionType<'a>,position:Vec<usize>) -> Self{
-		Expression { expr , position }
-	}
-}
-#[derive(Debug)]
-pub struct BinaryExpr<'a> {
-	pub left_expr:String,
-	pub operator:&'a TokenType,
-	pub right_expr:String
-}
-
-#[derive(Debug)]
-pub struct GroupingExpr {
-}
 
 #[derive(PartialEq, Eq,Clone)]
 pub struct Register{
@@ -139,6 +126,7 @@ impl Register {
 				println!("{:?}",val)
 			},
 			_ => {
+				//TODO change this to just return an error 
 				println!("the register is empty")
 			}
 		}
