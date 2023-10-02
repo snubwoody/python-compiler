@@ -3,6 +3,9 @@ use DataType::*;
 
 
 //TODO refactor this to only be an enum not a whole struct
+//TODO Without spaces binary expressions are tokenized as a word instead so FIX that
+//TODO letters are not parsed as identifiers
+
 #[derive(Clone,Debug,PartialEq)]
 pub enum TokenType {
 	NEWLINE,

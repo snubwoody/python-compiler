@@ -8,7 +8,7 @@ use python_compiler::{
 	DataType::*,
 };
 
-//TODO Without spaces binary expressions are tokenized as a word instead so FIX that
+//TODO its panicking for strings
 #[allow(unused_variables,unused_mut)]
 pub fn parse_expressions(tokens:&Vec<Token<'_>>,file:&String) -> Vec<Expression> {
 	//parse_grouping_expression(&mut expressions, tokens, file);
@@ -16,12 +16,27 @@ pub fn parse_expressions(tokens:&Vec<Token<'_>>,file:&String) -> Vec<Expression>
 
 	for (index,token) in tokens.iter().enumerate(){
 		match token._type {
+			&TIDENTIFIER |
+			&TSTRING |
 			&NUMBER => {
-				let number = 
+				let expr;
+				if token._type == &NUMBER {
+					let number = 
 					get_string(file, token.position[0]..token.position[1])
 					.parse::<i32>().unwrap();
 
-				let expr = LiteralExpression(INT(number));
+					expr = LiteralExpression(INT(number));
+				}
+				else if token._type == &TSTRING {
+					let string = get_string(file, token.position[0]..token.position[1]);
+
+					expr = LiteralExpression(STRING(string));
+				}
+				else {
+					let string = get_string(file, token.position[0]..token.position[1]);
+
+					expr = LiteralExpression(IDENTIFIER(string));
+				}
 				
 				if expressions.is_empty(){
 					expressions.push(expr.clone());
