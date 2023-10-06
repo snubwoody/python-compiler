@@ -7,6 +7,7 @@ use python_compiler::{
 	DataStack
 };
 use utils::file_to_string;
+use utils::get_string;
 use parser::parse_expressions;
 use lexer::tokenize;
 
@@ -28,8 +29,9 @@ fn main() {
 		Ok(file_contents) => {
 			file_tokens = tokenize(&file_contents);
 			expressions = parse_expressions(&file_tokens, &file_contents);
-			expressions.iter().for_each(|token| println!("{:?}",token))
-			//file_tokens.iter().for_each(|token| println!("{:?}",token))
+			expressions.iter().for_each(|token| println!("{:?}",token));
+
+			file_tokens.iter().for_each(|token| println!("{:?}",token));
 		}
 		Err(error) => {
 			println!("{}",error);

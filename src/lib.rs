@@ -83,7 +83,8 @@ pub enum StackError {
 #[derive(Debug,Clone,PartialEq)]
 pub enum Expression{
 	BinaryExpression(Box<Expression>,TokenType,Box<Expression>),
-	LiteralExpression(DataType)
+	LiteralExpression(DataType),
+	GroupingExpression(Box<Vec<Expression>>)
 }
 
 #[derive(PartialEq, Eq,Clone)]

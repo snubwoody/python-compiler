@@ -12,6 +12,12 @@ use python_compiler::{
 pub fn parse_expressions(tokens:&Vec<Token<'_>>,file:&String) -> Vec<Expression> {
 	let mut expressions:Vec<Expression> = vec![];
 
+	let expressions_temp = expressions.clone();
+
+	let mut grouping_expr = false;
+
+	let mut grouping_expr_temp = vec![];
+
 	for (index,token) in tokens.iter().enumerate(){
 		match token._type {
 			&TIDENTIFIER |
@@ -86,8 +92,16 @@ pub fn parse_expressions(tokens:&Vec<Token<'_>>,file:&String) -> Vec<Expression>
 						)
 					}
 				}
+			},
+			&OPENPARENTHESIS => {
+				grouping_expr = true;
 			}
 			_ => {}
+		}
+		
+		if grouping_expr {
+			let l = &expressions_temp[expressions_temp.len()-1];
+			grouping_expr_temp.push(l)
 		}
 	}
 

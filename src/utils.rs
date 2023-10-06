@@ -19,6 +19,7 @@ pub fn get_string(string:&String,range:Range<usize>) -> String{
 	let range = range;
 		
 	for i in range.into_iter(){word.push(string.chars().nth(i).unwrap())}
+	word = String::from(word.as_str().trim_matches('"'));
 	
 	return word;
 }
