@@ -4,14 +4,12 @@ use python_compiler::{
 	Token,
 	TokenType::*,
 	Expression::{*,self},
-	BinaryExpr,
 	DataType::*,
 };
 
 //TODO its panicking for strings
 #[allow(unused_variables,unused_mut)]
 pub fn parse_expressions(tokens:&Vec<Token<'_>>,file:&String) -> Vec<Expression> {
-	//parse_grouping_expression(&mut expressions, tokens, file);
 	let mut expressions:Vec<Expression> = vec![];
 
 	for (index,token) in tokens.iter().enumerate(){
@@ -44,16 +42,17 @@ pub fn parse_expressions(tokens:&Vec<Token<'_>>,file:&String) -> Vec<Expression>
 				}
 
 				match expressions[expressions.len()-1].clone() {
-					BinaryExpression(mut val) => {
-						//println!("yurr {:?}", expressions[expressions.len()-1].clone());
-						let right_expr = *val.right_expr;
+					BinaryExpression(mut left,opr,mut right) => {
+
+						let mut right_expr = *right;
+
 						match right_expr {
 							LiteralExpression(k) => {
 								if k == DANGLINGEXPR {
 									expressions.pop();
 									expressions.pop();
-									val.right_expr = Box::new(expr.clone());
-									expressions.push(BinaryExpression(val));
+									right_expr = expr.clone();
+									expressions.push(BinaryExpression(left,opr,Box::new(right_expr)));
 								}
 								else {
 									expressions.push(expr);
@@ -80,16 +79,10 @@ pub fn parse_expressions(tokens:&Vec<Token<'_>>,file:&String) -> Vec<Expression>
 				let previous_expr = expressions[expressions.len()-1].clone();
 				let next_expr = parse_literal_expression(&tokens[index+1], file);
 				match previous_expr {
-					BinaryExpression(v) => {}
+					BinaryExpression(x,y,z) => {}
 					_ =>{
 						expressions.push(
-							BinaryExpression(
-								BinaryExpr { 
-									left_expr: Box::new(previous_expr), 
-									operator: token._type.clone(), 
-									right_expr: Box::new(LiteralExpression(DANGLINGEXPR)), 
-								}
-							)
+							BinaryExpression(Box::new(previous_expr),token._type.clone(),Box::new(LiteralExpression(DANGLINGEXPR)), )
 						)
 					}
 				}

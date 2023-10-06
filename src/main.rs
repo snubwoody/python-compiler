@@ -12,7 +12,7 @@ use lexer::tokenize;
 
 
 
-#[allow(unused_variables,unused_mut)]
+#[allow(unused_variables,unused_mut,unused_assignments)]
 fn main() {
 	let file_tokens: Vec<Token<'_>>;
 	let mut expressions = Vec::new();
@@ -28,9 +28,8 @@ fn main() {
 		Ok(file_contents) => {
 			file_tokens = tokenize(&file_contents);
 			expressions = parse_expressions(&file_tokens, &file_contents);
-			//println!("the length of the expr is {:?}",expressions[1]);
-			//expressions.iter().for_each(|token| println!("{:?}",token))
-			file_tokens.iter().for_each(|token| println!("{:?}",token))
+			expressions.iter().for_each(|token| println!("{:?}",token))
+			//file_tokens.iter().for_each(|token| println!("{:?}",token))
 		}
 		Err(error) => {
 			println!("{}",error);

@@ -4,9 +4,11 @@ use python_compiler::{
 	TokenType::*,
 };
 use regex::Regex;
+use crate::utils::is_in_range;
+
 
 pub fn tokenize(input_str:&str) -> Vec<Token>{
-	
+	//TODO problems with identifiers
 	let mut tokens: Vec<Token<'_>> = vec![];
 
 	let regex_patterns: Vec<TokenRegex> = vec![
@@ -16,8 +18,8 @@ pub fn tokenize(input_str:&str) -> Vec<Token>{
 		TokenRegex{_type:&NEWLINE,regex_pattern:Regex::new(r"\n").unwrap()},
 		TokenRegex{_type:&EQUALS,regex_pattern:Regex::new(r"(=)").unwrap()},
 		TokenRegex{_type:&NUMBER,regex_pattern:Regex::new(r"\d").unwrap()},
-		TokenRegex{_type:&WORD,regex_pattern:Regex::new(r"\w+[^(\n\s)]+\w").unwrap()},
-		TokenRegex{_type:&QUOTATION,regex_pattern:Regex::new(r#"""#).unwrap()},
+		TokenRegex{_type:&TIDENTIFIER,regex_pattern:Regex::new(r#"[a-z][^\n\d\s]+"#).unwrap()},
+		TokenRegex{_type:&TSTRING,regex_pattern:Regex::new(r#"("+.+")"#).unwrap()},
 		TokenRegex{_type:&DIVIDE,regex_pattern:Regex::new(r#"(\/)"#).unwrap()},
 		TokenRegex{_type:&MULTIPY,regex_pattern:Regex::new(r#"(\*)"#).unwrap()},
 		TokenRegex{_type:&ADD,regex_pattern:Regex::new(r#"(\+)"#).unwrap()},
@@ -30,79 +32,32 @@ pub fn tokenize(input_str:&str) -> Vec<Token>{
 	for i in regex_patterns {
 		let _matches = i.regex_pattern.find_iter(&input_str);
 		for regex_match in _matches{
-			tokens.push(Token{ _type: &i._type, position: vec![regex_match.start(),regex_match.end()]})
-		}
-	}
-	
-	tokens.sort_by(|a,b| a.position.cmp(&b.position));
-
-	let items = tokens.clone();
-
-	let mut quotation_found = false;
-	let mut string_vec = vec![];
-	let mut tokens_temp = vec![];
-	
-	for (_size,token) in items.into_iter().enumerate(){
-		if token._type == &QUOTATION{
-			if quotation_found{
-				let start_position:&Vec<usize> = string_vec.first().unwrap();
-				let end_postion = string_vec.last().unwrap();
-				tokens_temp.push(Token { _type:&TSTRING, position:vec![start_position[0],end_postion[1]] });
-				string_vec.clear();
-			}
-			quotation_found = !quotation_found;
-			continue;
-		}
-		if quotation_found{
-			//println!("{:?}",token._type);
-			string_vec.push(token.position)
+			tokens.push(Token{ _type: &i._type, position: vec![regex_match.start(),regex_match.end()]});
 		}
 	}
 
-	for (_size,i) in tokens_temp.into_iter().enumerate(){
-		tokens.push(i)
-	}
-	
-	//Removing the whitespace but remember to check for errors before it is removed
-	tokens.sort_by(|a,b| a.position.cmp(&b.position));
+	let mut to_be_removed = vec![];
 	
 	tokens.retain(|token| token._type != &QUOTATION && token._type != &WHITESPACE);
 
-	let mut to_be_removed = vec![];
-	let mut to_be_added = vec![];
+	let tokens_temp = tokens.clone();
 
-	tokens.iter().for_each(|token|{
-		match token._type {  
-			&TSTRING => {
-				let range = &token.position;
-				tokens.iter().for_each(|item| {
-					if (range.contains(&item.position[0]) || range.contains(&item.position[1])) && item != token{
-						to_be_removed.push(item.clone());
-					} 
-				})
+	tokens_temp.iter().for_each(|token| 
+		if token._type == &TSTRING {
+			tokens_temp.iter().for_each(|t|
+			if is_in_range(token.position[0]..token.position[1],t.position[0]..t.position[1]) && 
+				t._type == &TIDENTIFIER {
+				to_be_removed.push(t);
+				//println!("{:?}",t._type)
 			}
-			_ => {}
+		)
 		}
-	});
-
+	);
 	
-
-	tokens.retain(|token| !to_be_removed.contains(token));
-
-	tokens.iter().for_each(|token|{
-		match token._type {  
-			&WORD => {
-				to_be_removed.push(token.clone());
-				to_be_added.push(Token { _type: &TIDENTIFIER, position: vec![token.position[0],token.position[1]] })
-			},
-			_ => {}
-		}
-	});
-
-	to_be_added.into_iter().for_each(|token| tokens.push(token));
-	tokens.retain(|token| !to_be_removed.contains(token));
-
 	tokens.sort_by(|a,b| a.position.cmp(&b.position));
+
+	tokens.retain(|token| !to_be_removed.contains(&token));
 
 	return tokens;
 }
+

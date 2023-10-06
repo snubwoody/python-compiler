@@ -22,3 +22,10 @@ pub fn get_string(string:&String,range:Range<usize>) -> String{
 	
 	return word;
 }
+
+pub fn is_in_range(range_outer:Range<usize>,range_inner:Range<usize>) -> bool{
+	if range_outer.start <= range_inner.start && range_outer.end >= range_inner.end {
+		return true;
+	}
+	return false;
+}

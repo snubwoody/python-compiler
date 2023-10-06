@@ -1,8 +1,2 @@
-v
-
-fed = 4
-
-k = 3
-
-s = fed + k
-
+vec = "hello world"
+hi = 0

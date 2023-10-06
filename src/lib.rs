@@ -1,7 +1,6 @@
 use regex::Regex;
 use DataType::*;
 
-
 //TODO refactor this to only be an enum not a whole struct
 //TODO Without spaces binary expressions are tokenized as a word instead so FIX that
 //TODO letters are not parsed as identifiers
@@ -83,17 +82,9 @@ pub enum StackError {
 
 #[derive(Debug,Clone,PartialEq)]
 pub enum Expression{
-	BinaryExpression(BinaryExpr),
+	BinaryExpression(Box<Expression>,TokenType,Box<Expression>),
 	LiteralExpression(DataType)
 }
-
-#[derive(Debug,Clone,PartialEq)]
-pub struct BinaryExpr{
-	pub left_expr:Box<Expression>,
-	pub operator:TokenType,
-	pub right_expr:Box<Expression>
-}
-
 
 #[derive(PartialEq, Eq,Clone)]
 pub struct Register{
