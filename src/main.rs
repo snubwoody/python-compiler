@@ -17,21 +17,21 @@ use lexer::tokenize;
 fn main() {
 	let file_tokens: Vec<Token<'_>>;
 	let mut expressions = Vec::new();
-	let mut rg1 = Register::new();
-	let mut rg2 = Register::new();
-	let mut rg3 = Register::new();
-	let mut rg4 = Register::new();
+	let mut rg1: Register<'_> = Register::new();
+	let mut rg2: Register<'_> = Register::new();
+	let mut rg3: Register<'_> = Register::new();
+	let mut rg4: Register<'_> = Register::new();
 
-	let mut stack:DataStack = DataStack::new();
+	let mut stack:DataStack<'_> = DataStack::new();
 	
     match file_to_string("src/main.py") {
 
 		Ok(file_contents) => {
 			file_tokens = tokenize(&file_contents);
 			expressions = parse_expressions(&file_tokens, &file_contents);
-			expressions.iter().for_each(|token| println!("{:?}",token));
+			//expressions.iter().for_each(|token| println!("{:?}",token));
 
-			file_tokens.iter().for_each(|token| println!("{:?}",token));
+			//file_tokens.iter().for_each(|token| println!("{:?}",token));
 		}
 		Err(error) => {
 			println!("{}",error);

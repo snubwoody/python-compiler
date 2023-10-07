@@ -1,7 +1,6 @@
 use regex::Regex;
 use DataType::*;
 
-//TODO refactor this to only be an enum not a whole struct
 //TODO Without spaces binary expressions are tokenized as a word instead so FIX that
 //TODO letters are not parsed as identifiers
 
@@ -43,16 +42,16 @@ pub struct Token<'a> {
 }
 
 #[derive(PartialEq, Eq,Debug,Clone)]
-pub enum DataType {
+pub enum DataType<'a> {
 	INT(i32),
 	STRING(String),
 	BOOL(bool),
-	IDENTIFIER(String),
+	IDENTIFIER(&'a str),
 	NONE,
 	DANGLINGEXPR
 }
 
-impl DataType {
+impl<'a> DataType<'a> {
     pub fn get_int(&self) -> Option<i32> {
         match self {
             INT(value) => Some(*value),
@@ -81,24 +80,24 @@ pub enum StackError {
 }
 
 #[derive(Debug,Clone,PartialEq)]
-pub enum Expression{
-	BinaryExpression(Box<Expression>,TokenType,Box<Expression>),
-	LiteralExpression(DataType),
-	GroupingExpression(Box<Vec<Expression>>)
+pub enum Expression<'a>{
+	BinaryExpression(Box<Expression<'a>>,TokenType,Box<Expression<'a>>),
+	LiteralExpression(DataType<'a>),
+	GroupingExpression(Box<Vec<Expression<'a>>>)
 }
 
 #[derive(PartialEq, Eq,Clone)]
-pub struct Register{
-	pub value:Option<DataType>
+pub struct Register<'a>{
+	pub value:Option<DataType<'a>>
 }
 
 //TODO theres A LOT of potential undefined behaviour here FIX IT
-impl Register {
+impl<'a> Register<'a> {
 	pub fn new() -> Self{
 		Register { value:None }
 	}
 
-	pub fn mov(&mut self,value:DataType) {
+	pub fn mov(&'a mut self,value:DataType<'a>) {
 		self.value = Option::Some(value);
 	}
 
@@ -130,16 +129,16 @@ impl Register {
 }
 
 #[derive(PartialEq,Debug)]
-pub struct DataStack {
-	pub data:Vec<DataType>
+pub struct DataStack<'a> {
+	pub data:Vec<DataType<'a>>
 }
 
-impl DataStack {
+impl<'a> DataStack<'a> {
 	pub fn new() -> Self {
 		DataStack { data:Vec::new() }
 	}
 
-	pub fn _push(&mut self,value:DataType) {
+	pub fn _push(&'a mut self,value:DataType<'a>) {
 		self.data.push(value);
 		
 	}

@@ -7,16 +7,15 @@ use python_compiler::{
 	DataType::*,
 };
 
-//TODO its panicking for strings
 #[allow(unused_variables,unused_mut)]
-pub fn parse_expressions(tokens:&Vec<Token<'_>>,file:&String) -> Vec<Expression> {
-	let mut expressions:Vec<Expression> = vec![];
+pub fn parse_expressions<'a>(tokens:&Vec<Token<'_>>,file:&String) -> Vec<Expression<'a>> {
+	let mut expressions:Vec<Expression<'a>> = vec![] ;
 
-	let expressions_temp = expressions.clone();
+	let mut grouping_expr: bool = false;
 
-	let mut grouping_expr = false;
+	let mut grouping_expr_temp: Vec<Expression<'a>> = vec![];
 
-	let mut grouping_expr_temp = vec![];
+	let mut string_vec: Vec<&str> = vec![];
 
 	for (index,token) in tokens.iter().enumerate(){
 		match token._type {
@@ -37,9 +36,10 @@ pub fn parse_expressions(tokens:&Vec<Token<'_>>,file:&String) -> Vec<Expression>
 					expr = LiteralExpression(STRING(string));
 				}
 				else {
-					let string = get_string(file, token.position[0]..token.position[1]);
+					let string = get_string(file, token.position[0]..token.position[1]).as_str();
+					string_vec.push(string);
 
-					expr = LiteralExpression(IDENTIFIER(string));
+					expr = LiteralExpression(IDENTIFIER(string_vec.last().unwrap()));
 				}
 				
 				if expressions.is_empty(){
@@ -96,19 +96,34 @@ pub fn parse_expressions(tokens:&Vec<Token<'_>>,file:&String) -> Vec<Expression>
 			&OPENPARENTHESIS => {
 				grouping_expr = true;
 			}
+			&CLOSEPARENTHESIS => {
+				grouping_expr = false;
+			}
 			_ => {}
 		}
-		
+		let expressions_temp: Vec<Expression<'a>> = expressions.clone();
 		if grouping_expr {
-			let l = &expressions_temp[expressions_temp.len()-1];
-			grouping_expr_temp.push(l)
+			
+			match expressions_temp.last() {
+				Some(val) => {
+					let k = val.clone();
+					grouping_expr_temp.push(k);
+				},
+				None => {
+					println!("it is empty")
+				}
+			}
+
+			
 		}
 	}
+
+	grouping_expr_temp.iter().for_each(|t|println!("{:?}",t));
 
 	return expressions;
 }
 
-fn parse_literal_expression(token:&Token,file:&String) -> Expression {
+fn parse_literal_expression<'a>(token:&Token,file:&String) -> Expression<'a> {
 	match token._type {
 		&NUMBER => {
 			let number = 
