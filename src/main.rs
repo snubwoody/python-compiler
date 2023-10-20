@@ -7,7 +7,6 @@ use python_compiler::{
 	DataStack
 };
 use utils::file_to_string;
-use utils::get_string;
 use parser::parse_expressions;
 use lexer::tokenize;
 

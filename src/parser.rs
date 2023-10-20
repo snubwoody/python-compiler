@@ -29,35 +29,6 @@ pub fn parse_expressions<'a>(tokens:&Vec<Token<'_>>,file:&String) -> Vec<Express
 					expressions.push(expr.clone());
 					continue;
 				}
-
-				match expressions[expressions.len()-1].clone() {
-					BinaryExpression(mut left,opr,mut right) => {
-
-						let mut right_expr = *right;
-
-						match right_expr {
-							LiteralExpression(k) => {
-								if k == DANGLINGEXPR {
-									expressions.pop();
-									expressions.pop();
-									right_expr = expr.clone();
-									expressions.push(BinaryExpression(left,opr,Box::new(right_expr)));
-								}
-								else {
-									expressions.push(expr);
-								}
-							}
-							_ => {
-								expressions.push(expr);
-								//println!("nope")
-							}
-						}
-					},
-					_ => {
-						expressions.push(expr);
-					}
-				}
-				
 			},
 			&ADD | 
 			&EQUALS |
@@ -65,16 +36,25 @@ pub fn parse_expressions<'a>(tokens:&Vec<Token<'_>>,file:&String) -> Vec<Express
 			&SUBTRACT | 
 			&DIVIDE	=> 
 			{
-				let previous_expr = expressions[expressions.len()-1].clone();
-				let next_expr = parse_literal_expression(&tokens[index+1], file);
-				match previous_expr {
-					BinaryExpression(x,y,z) => {}
-					_ =>{
-						expressions.push(
-							BinaryExpression(Box::new(previous_expr),token._type.clone(),Box::new(LiteralExpression(DANGLINGEXPR)), )
-						)
+				match expressions.last().unwrap() {
+					BinaryExpression(..) => {},
+					_ => {
+						expressions.pop();
 					}
 				}
+				
+				expressions.push(
+					parse_binary_expression(
+						token.clone(), 
+						file,
+						expressions.clone(),
+						parse_literal_expression(&tokens[index-1], file),
+						index,
+						tokens
+					)
+				);
+				
+				
 			},
 			&OPENPARENTHESIS => {
 				grouping_expr = true;
@@ -127,4 +107,15 @@ fn parse_literal_expression<'a>(token:&Token,file:&String) -> Expression<'a> {
 
 }
 
-
+fn parse_binary_expression<'a>(
+	token:Token,
+	file:&String,
+	_expressions:Vec<Expression<'a>>,
+	prev_expr:Expression<'a>,
+	index:usize,
+	tokens:&Vec<Token>
+) -> Expression<'a> {
+	//TODO account for multiple binary expressions
+	let next_expr = parse_literal_expression(&tokens[index+1], file);
+	BinaryExpression(Box::new(prev_expr),token._type.clone(), Box::new(next_expr))
+}
