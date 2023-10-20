@@ -1,4 +1,4 @@
 vec = "hello world"
 hi = 0
 
-var = (5+1)
+var = (5 + 1)

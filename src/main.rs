@@ -29,7 +29,7 @@ fn main() {
 		Ok(file_contents) => {
 			file_tokens = tokenize(&file_contents);
 			expressions = parse_expressions(&file_tokens, &file_contents);
-			//expressions.iter().for_each(|token| println!("{:?}",token));
+			expressions.iter().for_each(|token| println!("{:?}",token));
 
 			//file_tokens.iter().for_each(|token| println!("{:?}",token));
 		}

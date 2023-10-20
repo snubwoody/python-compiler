@@ -46,7 +46,8 @@ pub enum DataType<'a> {
 	INT(i32),
 	STRING(String),
 	BOOL(bool),
-	IDENTIFIER(&'a str),
+	IDENTIFIER(String),
+	PLACEHOLDER(&'a str),
 	NONE,
 	DANGLINGEXPR
 }

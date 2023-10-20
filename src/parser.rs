@@ -15,32 +15,15 @@ pub fn parse_expressions<'a>(tokens:&Vec<Token<'_>>,file:&String) -> Vec<Express
 
 	let mut grouping_expr_temp: Vec<Expression<'a>> = vec![];
 
-	let mut string_vec: Vec<&str> = vec![];
+	let mut string_vec: Vec<String> = vec![];
 
 	for (index,token) in tokens.iter().enumerate(){
 		match token._type {
+
 			&TIDENTIFIER |
 			&TSTRING |
 			&NUMBER => {
-				let expr;
-				if token._type == &NUMBER {
-					let number = 
-					get_string(file, token.position[0]..token.position[1])
-					.parse::<i32>().unwrap();
-
-					expr = LiteralExpression(INT(number));
-				}
-				else if token._type == &TSTRING {
-					let string = get_string(file, token.position[0]..token.position[1]);
-
-					expr = LiteralExpression(STRING(string));
-				}
-				else {
-					let string = get_string(file, token.position[0]..token.position[1]).as_str();
-					string_vec.push(string);
-
-					expr = LiteralExpression(IDENTIFIER(string_vec.last().unwrap()));
-				}
+				let expr: Expression<'_> = parse_literal_expression(token, file);
 				
 				if expressions.is_empty(){
 					expressions.push(expr.clone());
@@ -101,10 +84,10 @@ pub fn parse_expressions<'a>(tokens:&Vec<Token<'_>>,file:&String) -> Vec<Express
 			}
 			_ => {}
 		}
-		let expressions_temp: Vec<Expression<'a>> = expressions.clone();
+		
 		if grouping_expr {
 			
-			match expressions_temp.last() {
+			match expressions.last() {
 				Some(val) => {
 					let k = val.clone();
 					grouping_expr_temp.push(k);
@@ -118,7 +101,7 @@ pub fn parse_expressions<'a>(tokens:&Vec<Token<'_>>,file:&String) -> Vec<Express
 		}
 	}
 
-	grouping_expr_temp.iter().for_each(|t|println!("{:?}",t));
+	//grouping_expr_temp.iter().for_each(|t|println!("{:?}",t));
 
 	return expressions;
 }
@@ -131,6 +114,14 @@ fn parse_literal_expression<'a>(token:&Token,file:&String) -> Expression<'a> {
 				.parse::<i32>().unwrap();
 			return LiteralExpression(INT(number))
 		},
+		&TSTRING => {
+			let string = get_string(file, token.position[0]..token.position[1]);
+			return LiteralExpression(STRING(string));
+		},
+		&TIDENTIFIER => {
+			let string = get_string(file, token.position[0]..token.position[1]);
+			return  LiteralExpression(IDENTIFIER(string));
+		}
 		_ => {return LiteralExpression(NONE);}
 	}
 
